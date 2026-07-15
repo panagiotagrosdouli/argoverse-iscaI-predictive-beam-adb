@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="docs/image2.png" width="100%" alt="Rare-Event-Aware Predictive Beam Management graphical abstract">
-</p>
-
 <h1 align="center">🚗 Argoverse ISCAI</h1>
 <h3 align="center">Uncertainty-Aware Predictive Beam and Illumination Control</h3>
 
@@ -21,6 +17,10 @@
 </p>
 
 > **From synthetic tracks to real traffic scenes:** short-horizon trajectory prediction, uncertainty propagation, adaptive beam probing, and predictive adaptive driving beam control for vehicular integrated sensing, communication, and illumination (ISCAI).
+
+<p align="center">
+  <img src="docs/image2.png" width="100%" alt="Rare-Event-Aware Predictive Beam Management graphical abstract">
+</p>
 
 ---
 
