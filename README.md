@@ -1,13 +1,26 @@
-# Argoverse ISCAI: Uncertainty-Aware Predictive Beam and Illumination Control
+<p align="center">
+  <img src="docs/image2.png" width="100%" alt="Rare-Event-Aware Predictive Beam Management graphical abstract">
+</p>
 
-[![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/)
-[![Dataset](https://img.shields.io/badge/Dataset-Argoverse%202-orange)](https://www.argoverse.org/av2.html)
-[![Research](https://img.shields.io/badge/Status-Research%20Prototype-purple)](#research-status)
-[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+<h1 align="center">🚗 Argoverse ISCAI</h1>
+<h3 align="center">Uncertainty-Aware Predictive Beam and Illumination Control</h3>
+
+<p align="center">
+  <strong>Trajectory Prediction • Risk Estimation • Adaptive Top-K Beam Selection • Predictive ADB</strong>
+</p>
+
+<p align="center">
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.10%2B-blue" alt="Python"></a>
+  <a href="https://www.argoverse.org/av2.html"><img src="https://img.shields.io/badge/Dataset-Argoverse%202-orange" alt="Argoverse 2"></a>
+  <img src="https://img.shields.io/badge/Status-Research%20Prototype-purple" alt="Research Prototype">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green" alt="MIT License"></a>
+</p>
+
+<p align="center">
+  <a href="README_GR.md">🇬🇷 Ελληνική τεκμηρίωση</a>
+</p>
 
 > **From synthetic tracks to real traffic scenes:** short-horizon trajectory prediction, uncertainty propagation, adaptive beam probing, and predictive adaptive driving beam control for vehicular integrated sensing, communication, and illumination (ISCAI).
-
-[Ελληνική τεκμηρίωση](README_GR.md)
 
 ---
 
@@ -117,6 +130,9 @@ This policy spends additional beam probes only when the estimated motion/control
 .
 ├── configs/                       Experiment configuration
 ├── data/                          Dataset instructions; raw AV2 data are ignored
+├── docs/
+│   ├── image2.png                 Generated research infographic
+│   └── graphical_abstract.svg     Vector graphical abstract
 ├── scripts/
 │   ├── inspect_scenario.py        Visualize one AV2 scenario
 │   ├── run_baseline_demo.py       End-to-end single-scenario demo
