@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8fbff"/><stop offset="1" stop-color="#eef5ff"/></linearGradient>
+    <linearGradient id="risk" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2ca25f"/><stop offset="0.55" stop-color="#ffcc33"/><stop offset="1" stop-color="#e63946"/></linearGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-opacity="0.16"/></filter>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#183b66"/></marker>
+    <style>
+      .title{font:700 44px Arial,sans-serif;fill:#102a43}.subtitle{font:400 22px Arial,sans-serif;fill:#355c7d}
+      .h{font:700 25px Arial,sans-serif;fill:#102a43}.p{font:400 18px Arial,sans-serif;fill:#334e68}.small{font:400 15px Arial,sans-serif;fill:#486581}
+      .metric{font:700 30px Arial,sans-serif;fill:#0b6e4f}.box{fill:#fff;stroke:#b8cbe0;stroke-width:2;rx:24;filter:url(#shadow)}
+    </style>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <text x="80" y="80" class="title">Rare-Event-Aware Predictive Beam Management</text>
+  <text x="80" y="118" class="subtitle">From Argoverse 2 trajectories to risk-adaptive Top-K beams and predictive ADB</text>
+
+  <g transform="translate(70 175)">
+    <rect class="box" x="0" y="0" width="240" height="250"/>
+    <text x="120" y="42" text-anchor="middle" class="h">1. Argoverse 2</text>
+    <ellipse cx="120" cy="100" rx="58" ry="22" fill="#5b8def"/><rect x="62" y="100" width="116" height="62" fill="#7aa2f7"/><ellipse cx="120" cy="162" rx="58" ry="22" fill="#5b8def"/>
+    <path d="M70 205 C100 175,145 175,175 205" fill="none" stroke="#183b66" stroke-width="6"/>
+    <circle cx="82" cy="210" r="10" fill="#183b66"/><circle cx="162" cy="210" r="10" fill="#183b66"/>
+    <text x="120" y="235" text-anchor="middle" class="small">Real-world motion scenarios</text>
+
+    <rect class="box" x="300" y="0" width="240" height="250"/>
+    <text x="420" y="42" text-anchor="middle" class="h">2. Prediction</text>
+    <path d="M335 190 C365 175,385 150,410 145" fill="none" stroke="#111" stroke-width="4"/>
+    <path d="M410 145 C455 115,470 92,510 72" fill="none" stroke="#2ca25f" stroke-width="5"/>
+    <path d="M410 145 C458 132,480 132,512 140" fill="none" stroke="#3b82f6" stroke-width="4" stroke-dasharray="10 8"/>
+    <path d="M410 145 C455 162,480 188,515 208" fill="none" stroke="#3b82f6" stroke-width="4" stroke-dasharray="10 8"/>
+    <text x="420" y="235" text-anchor="middle" class="small">CV + Kalman baselines</text>
+
+    <rect class="box" x="600" y="0" width="240" height="250"/>
+    <text x="720" y="42" text-anchor="middle" class="h">3. Risk Estimation</text>
+    <path d="M655 170 A65 65 0 0 1 785 170" fill="none" stroke="url(#risk)" stroke-width="22"/>
+    <line x1="720" y1="170" x2="770" y2="112" stroke="#102a43" stroke-width="6" stroke-linecap="round"/><circle cx="720" cy="170" r="10" fill="#102a43"/>
+    <text x="650" y="205" class="small">low</text><text x="780" y="205" text-anchor="end" class="small">high</text>
+    <text x="720" y="232" text-anchor="middle" class="small">uncertainty · turn rate · FOV proximity</text>
+
+    <rect class="box" x="900" y="0" width="240" height="250"/>
+    <text x="1020" y="42" text-anchor="middle" class="h">4. Adaptive Top-K</text>
+    <circle cx="955" cy="185" r="8" fill="#102a43"/>
+    <path d="M955 185 Q1020 150 1100 75" fill="none" stroke="#2f80ed" stroke-width="4"/>
+    <path d="M955 185 Q1025 175 1108 130" fill="none" stroke="#2f80ed" stroke-width="4"/>
+    <path d="M955 185 Q1025 195 1108 185" fill="none" stroke="#2f80ed" stroke-width="4"/>
+    <path d="M955 185 Q1025 220 1100 228" fill="none" stroke="#2f80ed" stroke-width="4"/>
+    <text x="1020" y="235" text-anchor="middle" class="small">More beams only when risk rises</text>
+
+    <rect class="box" x="1200" y="0" width="240" height="250"/>
+    <text x="1320" y="42" text-anchor="middle" class="h">5. Predictive ADB</text>
+    <polygon points="1250,190 1395,105 1395,230" fill="#7bd389" opacity="0.35"/>
+    <polygon points="1250,190 1395,145 1395,195" fill="#ff6b6b" opacity="0.35"/>
+    <rect x="1260" y="155" width="78" height="48" rx="14" fill="#4c78a8" transform="rotate(-15 1299 179)"/>
+    <circle cx="1280" cy="204" r="8" fill="#111"/><circle cx="1322" cy="192" r="8" fill="#111"/>
+    <circle cx="1395" cy="80" r="24" fill="#2ca25f"/><path d="M1383 80 l8 8 16 -18" fill="none" stroke="#fff" stroke-width="6"/>
+    <text x="1320" y="235" text-anchor="middle" class="small">Risk-expanded shadow zones</text>
+
+    <line x1="240" y1="125" x2="290" y2="125" stroke="#183b66" stroke-width="5" marker-end="url(#arrow)"/>
+    <line x1="540" y1="125" x2="590" y2="125" stroke="#183b66" stroke-width="5" marker-end="url(#arrow)"/>
+    <line x1="840" y1="125" x2="890" y2="125" stroke="#183b66" stroke-width="5" marker-end="url(#arrow)"/>
+    <line x1="1140" y1="125" x2="1190" y2="125" stroke="#183b66" stroke-width="5" marker-end="url(#arrow)"/>
+  </g>
+
+  <g transform="translate(70 500)">
+    <rect class="box" x="0" y="0" width="470" height="300"/>
+    <text x="35" y="48" class="h">Experimental evidence · 100 scenarios</text>
+    <text x="35" y="98" class="p">Top-1 beam accuracy</text><text x="420" y="98" text-anchor="end" class="metric">86.35%</text>
+    <text x="35" y="145" class="p">Adaptive Top-K coverage</text><text x="420" y="145" text-anchor="end" class="metric">96.03%</text>
+    <text x="35" y="192" class="p">Average probed beams</text><text x="420" y="192" text-anchor="end" class="metric">2.27 / 16</text>
+    <text x="35" y="239" class="p">Beam-search overhead reduction</text><text x="420" y="239" text-anchor="end" class="metric">85.80%</text>
+    <text x="35" y="282" class="p">Predictive ADB coverage</text><text x="420" y="282" text-anchor="end" class="metric">95.23%</text>
+
+    <rect class="box" x="510" y="0" width="430" height="300"/>
+    <text x="545" y="48" class="h">Main scientific finding</text>
+    <text x="545" y="95" class="p">Constant Velocity outperformed the</text>
+    <text x="545" y="125" class="p">current Kalman configuration in:</text>
+    <text x="575" y="175" class="metric">73%</text><text x="665" y="175" class="p">of scenarios for ADE</text>
+    <text x="575" y="220" class="metric">69%</text><text x="665" y="220" class="p">of scenarios for FDE</text>
+    <text x="545" y="270" class="small">Risk adaptation targets the remaining rare, high-error cases.</text>
+
+    <rect class="box" x="980" y="0" width="450" height="300"/>
+    <text x="1015" y="48" class="h">Research contribution</text>
+    <text x="1015" y="95" class="p">• Geometry-grounded future beam labels</text>
+    <text x="1015" y="135" class="p">• Inference-time risk score</text>
+    <text x="1015" y="175" class="p">• Risk-adaptive Top-K probing</text>
+    <text x="1015" y="215" class="p">• Predictive uncertainty-aware ADB</text>
+    <text x="1015" y="255" class="p">• Bootstrap and worst-case analysis</text>
+  </g>
+
+  <text x="800" y="855" text-anchor="middle" class="small">github.com/panagiotagrosdouli/argoverse-iscaI-predictive-beam-adb</text>
+</svg>
