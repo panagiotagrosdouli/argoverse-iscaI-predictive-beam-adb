@@ -1,119 +1,308 @@
-# Argoverse ISCAI: Predictive Beam and ADB
+# Argoverse ISCAI: Uncertainty-Aware Predictive Beam and Illumination Control
 
-Research prototype for **uncertainty-aware trajectory-to-beam and illumination control** using the Argoverse 2 Motion Forecasting Dataset.
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/)
+[![Dataset](https://img.shields.io/badge/Dataset-Argoverse%202-orange)](https://www.argoverse.org/av2.html)
+[![Research](https://img.shields.io/badge/Status-Research%20Prototype-purple)](#research-status)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-## Objective
+> **From synthetic tracks to real traffic scenes:** short-horizon trajectory prediction, uncertainty propagation, adaptive beam probing, and predictive adaptive driving beam control for vehicular integrated sensing, communication, and illumination (ISCAI).
 
-The project extends a PC-FMCW vehicular ISCAI pipeline with:
+[Ελληνική τεκμηρίωση](README_GR.md)
 
-1. real-world actor trajectories from Argoverse 2,
-2. short-horizon trajectory prediction,
-3. uncertainty-aware adaptive Top-K beam selection,
-4. predictive adaptive driving beam (ADB) shadow zones.
+---
 
-The original PC-FMCW/DPSK, range-Doppler and CA-CFAR subsystem is treated as Part A. This repository implements Part B.
+## Overview
 
-## Five-day scope
-
-- Argoverse 2 scenario loading and preprocessing
-- Ego-centric coordinate conversion
-- Constant-position and constant-velocity baselines
-- Kalman prediction with covariance
-- ADE, FDE and angular-error metrics
-- 16-beam geometric codebook
-- Adaptive Top-K selection
-- Predictive ADB angular shadow zones
-- Reproducible figures and CSV metrics
-
-A GRU predictor is optional after the deterministic pipeline is stable.
-
-## Repository layout
+This repository implements **Part B** of a vehicular PC-FMCW laser-headlamp research project. The original signal-processing chain—PC-FMCW/DPSK transmission, range-Doppler processing, CA-CFAR detection, and illumination control—is treated as Part A. This repository focuses on the research extension:
 
 ```text
-configs/              experiment configuration
-data/                 local dataset instructions; raw data are ignored
-scripts/              runnable command-line programs
-src/iscaI/            reusable Python package
-tests/                unit tests
-outputs/              generated figures and metrics
+Argoverse 2 real-world trajectories
+                ↓
+Short-horizon motion prediction
+                ↓
+Cartesian-to-angular uncertainty propagation
+                ↓
+Adaptive Top-K directional beam probing
+                ↓
+Predictive uncertainty-aware ADB shadow zones
 ```
 
-## Dataset layout
+The central research question is:
 
-Download the **Argoverse 2 Motion Forecasting Dataset** separately. Do not commit dataset files.
+> Can future actor motion and its uncertainty reduce directional beam-search overhead while preserving beam coverage and predictive illumination safety?
 
-Expected layout:
+---
+
+## Main contributions
+
+- Real-world evaluation on **Argoverse 2 Motion Forecasting** scenarios.
+- Ego-centric trajectory preprocessing at 10 Hz.
+- Constant-velocity and Kalman motion baselines.
+- ADE, FDE, and angular-error evaluation.
+- Geometry-derived directional beam codebook.
+- Probabilistic adaptive Top-K beam selection.
+- Uncertainty-aware predictive ADB angular shadow intervals.
+- Batch evaluation, bootstrap confidence intervals, and worst-case analysis.
+- Inference-time **risk estimator** using angular uncertainty, motion non-linearity, range, and field-of-view proximity.
+- Risk-adaptive beam coverage and ADB confidence policies.
+
+---
+
+## Current experimental results
+
+The following results were obtained on the first 100 Argoverse 2 training scenarios processed by the batch pipeline.
+
+### Trajectory prediction
+
+| Predictor | ADE ↓ | FDE ↓ | Mean angular error ↓ |
+|---|---:|---:|---:|
+| Constant velocity | **1.910 m** | **5.005 m** | **3.931°** |
+| Kalman constant velocity | 2.337 m | 5.602 m | 5.080° |
+
+Constant velocity produced lower ADE in **73%** of scenarios and lower FDE in **69%**. The paired mean ADE difference, `Kalman − CV`, was **0.427 m**, with a 95% bootstrap confidence interval of **[0.112, 0.744] m**.
+
+### Beam and predictive ADB control
+
+| Metric | Result |
+|---|---:|
+| Top-1 beam accuracy | 86.35% |
+| Adaptive Top-K coverage | 96.03% |
+| Average selected beams | 2.27 / 16 |
+| Beam-search overhead reduction | 85.80% |
+| Predictive ADB angular coverage | 95.23% |
+
+These numbers are **geometry-derived control metrics**, not measured optical-channel beam-power results. External validation with measured or ray-traced channel labels remains future work.
+
+---
+
+## Why risk-aware control?
+
+Average metrics hide rare but safety-critical failures. In the 100-scenario experiment:
+
+- 35 scenarios contained at least one Top-1 beam failure,
+- 11 scenarios had adaptive Top-K coverage below 100%,
+- 12 scenarios had predictive ADB coverage below 100%,
+- several worst cases exhibited very large angular errors despite strong median performance.
+
+The risk-aware extension uses only information available at inference time:
+
+\[
+R = w_\sigma r_\sigma + w_a r_a + w_\omega r_\omega + w_d r_d + w_f r_f,
+\]
+
+where the normalized terms represent:
+
+- predicted angular uncertainty,
+- recent acceleration,
+- recent turn rate,
+- close-range sensitivity,
+- proximity to the beam-codebook field-of-view boundary.
+
+The risk score changes the requested probability coverage and ADB confidence multiplier:
+
+| Risk score | Beam probability target | ADB confidence scale |
+|---:|---:|---:|
+| `< 0.25` | 90.0% | 1.64σ |
+| `0.25–0.50` | 95.0% | 1.96σ |
+| `0.50–0.75` | 98.0% | 2.33σ |
+| `≥ 0.75` | 99.5% | 2.58σ |
+
+This policy spends additional beam probes only when the estimated motion/control risk is high.
+
+---
+
+## Repository structure
 
 ```text
-data/raw/train/<scenario_id>/scenario_<scenario_id>.parquet
-data/raw/val/<scenario_id>/scenario_<scenario_id>.parquet
-data/raw/test/<scenario_id>/scenario_<scenario_id>.parquet
+.
+├── configs/                       Experiment configuration
+├── data/                          Dataset instructions; raw AV2 data are ignored
+├── scripts/
+│   ├── inspect_scenario.py        Visualize one AV2 scenario
+│   ├── run_baseline_demo.py       End-to-end single-scenario demo
+│   ├── run_batch_baselines.py     Batch baseline evaluation
+│   ├── analyze_batch_results.py   Bootstrap statistics and worst cases
+│   └── run_risk_aware_batch.py    Fixed vs risk-aware control comparison
+├── src/iscai/
+│   ├── adb.py                     Predictive angular shadow zones
+│   ├── beam.py                    Beam codebook and adaptive Top-K
+│   ├── data.py                    AV2 loading and actor-track extraction
+│   ├── evaluation.py              Trajectory and angular metrics
+│   ├── geometry.py                Ego-centric coordinate transformations
+│   ├── prediction.py              CV and Kalman predictors
+│   └── risk.py                    Inference-time risk estimator
+├── tests/                         Unit tests
+└── outputs/                       Generated figures, CSVs, and JSON metrics
 ```
 
-The loader also accepts a direct path to one scenario parquet file.
+---
 
 ## Installation
 
 Python 3.10 or 3.11 is recommended.
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate        # Linux/macOS
-# .venv\Scripts\activate         # Windows PowerShell
+git clone https://github.com/panagiotagrosdouli/argoverse-iscaI-predictive-beam-adb.git
+cd argoverse-iscaI-predictive-beam-adb
+
+python3 -m venv .venv
+source .venv/bin/activate
 python -m pip install --upgrade pip
 pip install -r requirements.txt
+pip install -e .
 ```
 
-## First run
-
-Inspect one scenario and create a trajectory plot:
+For WSL/Linux, point the project to an existing Argoverse 2 installation:
 
 ```bash
+export AV2_ROOT=/home/<user>/Datasets/Argoverse2
+```
+
+Expected dataset layout:
+
+```text
+$AV2_ROOT/
+├── train/<scenario_id>/scenario_<scenario_id>.parquet
+├── val/<scenario_id>/scenario_<scenario_id>.parquet
+└── test/<scenario_id>/scenario_<scenario_id>.parquet
+```
+
+Do not commit Argoverse data to this repository.
+
+---
+
+## Quick start
+
+### Inspect one scenario
+
+```bash
+SCENARIO=$(find "$AV2_ROOT/train" -name "scenario_*.parquet" | head -n 1)
+
 python scripts/inspect_scenario.py \
-  --scenario data/raw/train/<scenario_id>/scenario_<scenario_id>.parquet \
+  --scenario "$SCENARIO" \
   --output outputs/figures/scenario.png
 ```
 
-Run the first end-to-end baseline:
+### Run one end-to-end demonstration
 
 ```bash
 python scripts/run_baseline_demo.py \
-  --scenario data/raw/train/<scenario_id>/scenario_<scenario_id>.parquet \
+  --scenario "$SCENARIO" \
   --output-dir outputs/demo
 ```
 
-The demo performs:
+Generated files:
 
 ```text
-AV2 trajectory -> ego-centric coordinates -> constant-velocity prediction
--> future angle -> beam index -> predictive ADB shadow interval
+outputs/demo/trajectory_prediction.png
+outputs/demo/metrics.json
 ```
 
-## Scientific evaluation
+### Run the 100-scenario baseline experiment
 
-Trajectory metrics:
+```bash
+python scripts/run_batch_baselines.py \
+  --dataset-root "$AV2_ROOT" \
+  --split train \
+  --max-scenarios 100 \
+  --output-dir outputs/batch_100
+```
+
+### Analyze confidence intervals and worst cases
+
+```bash
+python scripts/analyze_batch_results.py \
+  --csv outputs/batch_100/per_scenario_metrics.csv \
+  --output-dir outputs/batch_100/analysis
+```
+
+### Compare fixed and risk-aware control
+
+```bash
+python scripts/run_risk_aware_batch.py \
+  --dataset-root "$AV2_ROOT" \
+  --split train \
+  --max-scenarios 100 \
+  --output-dir outputs/risk_aware_100
+```
+
+The comparison reports coverage gains, added beam probes, and the change in beam-search overhead.
+
+---
+
+## Scientific metrics
+
+### Trajectory prediction
 
 - Average Displacement Error (ADE)
 - Final Displacement Error (FDE)
 - Mean angular error
 
-Beam metrics:
+### Beam management
 
-- Top-1 accuracy
-- Top-K coverage
-- average number of probed beams
-- overhead reduction relative to exhaustive search
+- Top-1 beam accuracy
+- Adaptive Top-K coverage
+- Average number of selected beams
+- Overhead reduction relative to exhaustive search
+- Coverage-overhead trade-off
 
-ADB metrics:
+### Predictive ADB
 
-- angular interval IoU
-- shadow-zone violation rate
-- over-masking width
+- Angular shadow coverage
+- Shadow-zone violation rate
+- Angular interval width and over-masking
 
-## Important limitation
+### Statistical analysis
 
-The initial beam labels are geometry-derived from actor azimuth and not measured optical channel labels. This must be stated explicitly in the report. DeepSense or ray-traced validation is future work.
+- Paired predictor comparisons
+- Bootstrap 95% confidence intervals
+- Worst-case scenario ranking
+- Failure counts and tail analysis
 
-## License and data
+---
 
-Code in this repository is for academic research. Argoverse 2 data remain subject to their original dataset terms and are not redistributed here.
+## Methodological limitations
+
+1. Beam labels are derived from relative actor azimuth and a geometric codebook.
+2. The current experiments do not use measured optical beam-power vectors.
+3. Actor trajectories are based on dataset annotations rather than detections from the PC-FMCW sensing front end.
+4. The ADB evaluation is angular and does not yet include a full photometric SAE J3069 simulation.
+5. The risk policy is interpretable and hand-calibrated; learned or conformal risk calibration is future work.
+
+These limitations are stated explicitly to separate demonstrated results from planned extensions.
+
+---
+
+## Research roadmap
+
+- [x] Real-world AV2 trajectory pipeline
+- [x] Constant-velocity and Kalman baselines
+- [x] Uncertainty propagation to beam probabilities
+- [x] Predictive ADB angular control
+- [x] Batch evaluation and bootstrap analysis
+- [x] Worst-case scenario analysis
+- [x] Inference-time risk estimator
+- [x] Risk-adaptive Top-K and ADB confidence
+- [ ] Risk-policy calibration on validation data
+- [ ] GRU or Transformer trajectory predictor
+- [ ] Pedestrian/cyclist class-aware safety margins
+- [ ] DeepSense or ray-traced beam-label validation
+- [ ] Full optical/photometric ADB evaluation
+
+---
+
+## Research status
+
+This is an active academic research prototype. Results should be interpreted within the assumptions and limitations above. Reproducibility, transparent evaluation, and explicit separation between measured and geometry-derived quantities are design priorities.
+
+---
+
+## Citation
+
+A `CITATION.cff` file is included for software citation. A paper-style BibTeX entry will be added when the accompanying manuscript is finalized.
+
+---
+
+## License and data terms
+
+The source code is released under the MIT License. Argoverse 2 data are not redistributed and remain governed by the original dataset license and terms.
