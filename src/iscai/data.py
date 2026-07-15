@@ -94,11 +94,30 @@ def extract_actor_tracks(frame: pd.DataFrame, dt: float = 0.1) -> dict[str, Acto
 
 
 def find_ego_track(tracks: dict[str, ActorTrack]) -> ActorTrack:
-    """Return the autonomous-vehicle track from an AV2 scenario."""
+    """Return the autonomous-vehicle track from an AV2 scenario.
+
+    In AV2 motion-forecasting parquet files, the autonomous vehicle is normally
+    identified by ``track_id == 'AV'`` while its object type may simply be
+    ``vehicle``. Some converted datasets instead encode ego status in the object
+    type, so both conventions are supported.
+    """
     for track in tracks.values():
-        if track.object_type.upper() in {"AV", "EGO", "AUTONOMOUS_VEHICLE"}:
+        if track.track_id.strip().upper() in {"AV", "EGO", "AUTONOMOUS_VEHICLE"}:
             return track
-    raise ValueError("No AV/ego track was found in this scenario")
+
+    for track in tracks.values():
+        if track.object_type.strip().upper() in {
+            "AV",
+            "EGO",
+            "AUTONOMOUS_VEHICLE",
+        }:
+            return track
+
+    available_ids = sorted(track.track_id for track in tracks.values())[:10]
+    raise ValueError(
+        "No AV/ego track was found in this scenario. "
+        f"First available track IDs: {available_ids}"
+    )
 
 
 def split_observation_future(
