@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+title: "Argoverse ISCAI: Uncertainty-Aware Predictive Beam and Illumination Control"
+message: "If you use this software, please cite it using the metadata in this file."
+type: software
+authors:
+  - family-names: Grosdouli
+    given-names: Panagiota
+repository-code: "https://github.com/panagiotagrosdouli/argoverse-iscaI-predictive-beam-adb"
+url: "https://github.com/panagiotagrosdouli/argoverse-iscaI-predictive-beam-adb"
+license: MIT
+version: 0.1.0
+date-released: 2026-07-15
+keywords:
+  - Argoverse 2
+  - trajectory prediction
+  - beam management
+  - adaptive driving beam
+  - ISCAI
+  - uncertainty-aware control
